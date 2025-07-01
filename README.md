@@ -25,6 +25,7 @@ Esta aplicación permite a los usuarios crear, editar, eliminar y hacer seguimie
 - **IDE Recomendado**: Visual Studio Code con Extension Pack for Java
 
 ## 📁 Estructura del Proyecto
+```bash
 TrackerObjetivos/
 ├── src/
 │ ├── modelo/
@@ -45,6 +46,7 @@ TrackerObjetivos/
 │ ├── categorias.txt # Datos de categorías
 │ └── progreso.txt # Historial de progreso
 └── README.md
+```
 
 ## 🚀 Requisitos del Sistema
 
@@ -76,6 +78,7 @@ TrackerObjetivos/
     }
 
 3. **Clonar/Descargar el proyecto**:
+    ```bash
     git clone [URL-del-repositorio]
     cd TrackerObjetivos
 
