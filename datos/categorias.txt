@@ -1,0 +1,4 @@
+1|Personal|Objetivos personales y de crecimiento|#e74c3c|2025-07-01
+2|Trabajo|Objetivos profesionales y laborales|#3498db|2025-07-01
+3|Salud|Objetivos de salud y bienestar|#2ecc71|2025-07-01
+4|Educación|Objetivos de aprendizaje y estudio|#f39c12|2025-07-01

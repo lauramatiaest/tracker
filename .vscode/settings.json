@@ -1,0 +1,6 @@
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "build",
+    "java.configuration.runtimes": [],
+    "java.compile.nullAnalysis.mode": "automatic"
+}
