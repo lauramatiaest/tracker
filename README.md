@@ -11,6 +11,7 @@ Esta aplicación permite a los usuarios crear, editar, eliminar y hacer seguimie
 - **Gestión Completa de Objetivos**: Crear, editar, eliminar y actualizar objetivos
 - **Categorización**: Organizar objetivos por categorías personalizables
 - **Seguimiento de Progreso**: Registro detallado del avance con historial
+- **Sistema de Recordatorios**: Notificaciones automáticas para objetivos próximos a vencer
 - **Interfaz Intuitiva**: GUI desarrollada con Java Swing
 - **Persistencia de Datos**: Almacenamiento en archivos de texto formateados
 - **Filtros y Búsquedas**: Filtrar objetivos por categoría y estado
@@ -34,12 +35,14 @@ TrackerObjetivos/
 │ │ └── RegistroProgreso.java # Clase modelo para historial
 │ ├── vista/
 │ │ ├── VentanaPrincipal.java # Interfaz principal
-│ │ └── DialogoObjetivo.java # Diálogo para crear/editar objetivos
+│ │ ├── DialogoObjetivo.java # Diálogo para crear/editar objetivos
+│ │ └── DialogoRecordatorios.java # Diálogo para mostrar recordatorios
 │ ├── controlador/
 │ │ ├── ControladorObjetivos.java # Lógica de negocio - objetivos
 │ │ └── ControladorCategorias.java # Lógica de negocio - categorías
 │ ├── util/
-│ │ └── GestorArchivos.java # Manejo de archivos
+│ │ ├── GestorArchivos.java # Manejo de archivos
+│ │ └── ServicioRecordatorios.java # Servicio de recordatorios
 │ └── Main.java # Punto de entrada
 ├── datos/
 │ ├── objetivos.txt # Datos de objetivos
@@ -106,6 +109,12 @@ TrackerObjetivos/
     - Seleccionar objetivo
     - Clic en "Ver Historial"
     - Revisar todos los cambios de progreso
+    
+    Sistema de Recordatorios:
+    - Notificaciones automáticas al iniciar la aplicación
+    - Indicador visual de objetivos próximos a vencer
+    - Clic en "Ver Recordatorios" para revisar objetivos cercanos a su fecha límite
+    - Configurado para alertar sobre objetivos que vencen en los próximos 7 días
 
     Filtrar Objetivos:
     - Usar filtros por categoría y estado
@@ -116,8 +125,10 @@ TrackerObjetivos/
     - Ctrl+E: Editar objetivo seleccionado
     - Ctrl+U: Actualizar progreso
     - Ctrl+H: Ver historial
+    - Ctrl+R: Ver recordatorios
     - F5: Actualizar vista
     - Delete: Eliminar objetivo
 
 ## 👨‍💻 Autores
 - **Laura Matía Estépar**
+- **Pablo Bengoechea Pardo**

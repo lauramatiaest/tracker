@@ -9,11 +9,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import controlador.ControladorObjetivos;
 import modelo.Objetivo;
 import modelo.Categoria;
 import modelo.RegistroProgreso;
+import util.ServicioRecordatorios;
 
 public class VentanaPrincipal extends JFrame {
     
@@ -32,12 +35,68 @@ public class VentanaPrincipal extends JFrame {
     private JButton btnVerHistorial;
     private JButton btnActualizar;
     
+    // Componentes para recordatorios
+    private ServicioRecordatorios servicioRecordatorios;
+    private JMenuItem itemRecordatorios;
+    private JButton btnRecordatorios;
+    private JLabel lblRecordatorios;
+    
     public VentanaPrincipal(ControladorObjetivos controlador) {
         this.controlador = controlador;
         inicializarComponentes();
         configurarVentana();
         actualizarTabla();
         actualizarResumen();
+        inicializarServicioRecordatorios();
+    }
+    
+    /**
+     * Inicializa el servicio de recordatorios
+     */
+    private void inicializarServicioRecordatorios() {
+        // Crear servicio de recordatorios con 7 días de anticipación
+        servicioRecordatorios = new ServicioRecordatorios(7);
+        
+        // Agregar observador para mostrar notificaciones
+        servicioRecordatorios.agregarObservador(this::mostrarRecordatorios);
+        
+        // Iniciar el servicio con verificación cada 5 minutos (300000 ms)
+        // Para pruebas, se puede reducir a 10 segundos (10000 ms)
+        Timer timer = new Timer(true);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                SwingUtilities.invokeLater(() -> {
+                    List<Objetivo> objetivos = controlador.obtenerTodosLosObjetivos();
+                    servicioRecordatorios.verificarRecordatorios(objetivos);
+                });
+            }
+        }, 2000, 300000); // 2 segundos de retraso inicial, luego cada 5 minutos
+    }
+    
+    /**
+     * Muestra los recordatorios de objetivos próximos a vencer
+     * @param objetivosProximos Lista de objetivos próximos a vencer
+     */
+    private void mostrarRecordatorios(List<Objetivo> objetivosProximos) {
+        if (objetivosProximos != null && !objetivosProximos.isEmpty()) {
+            // Actualizar indicador visual
+            if (lblRecordatorios != null) {
+                lblRecordatorios.setText("¡" + objetivosProximos.size() + " objetivo(s) próximo(s) a vencer!");
+                lblRecordatorios.setVisible(true);
+            }
+            
+            // Mostrar diálogo de recordatorios al iniciar
+            if (!servicioRecordatorios.isNotificacionesMostradas()) {
+                DialogoRecordatorios dialogo = new DialogoRecordatorios(this, controlador, objetivosProximos);
+                dialogo.setVisible(true);
+            }
+        } else {
+            // Ocultar indicador si no hay objetivos próximos
+            if (lblRecordatorios != null) {
+                lblRecordatorios.setVisible(false);
+            }
+        }
     }
     
     private void inicializarComponentes() {
@@ -85,6 +144,23 @@ public class VentanaPrincipal extends JFrame {
         panelFiltros.add(btnActualizar);
         
         panel.add(panelFiltros, BorderLayout.WEST);
+        
+        // Panel de recordatorios
+        JPanel panelRecordatorios = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        // Etiqueta de recordatorios
+        lblRecordatorios = new JLabel("¡Objetivos próximos a vencer!");
+        lblRecordatorios.setForeground(new Color(204, 0, 0));
+        lblRecordatorios.setFont(new Font(lblRecordatorios.getFont().getName(), Font.BOLD, 12));
+        lblRecordatorios.setVisible(false); // Inicialmente oculto
+        panelRecordatorios.add(lblRecordatorios);
+        
+        // Botón de recordatorios
+        btnRecordatorios = new JButton("Ver Recordatorios");
+        btnRecordatorios.addActionListener(e -> mostrarDialogoRecordatorios());
+        panelRecordatorios.add(btnRecordatorios);
+        
+        panel.add(panelRecordatorios, BorderLayout.EAST);
         
         return panel;
     }
@@ -543,8 +619,14 @@ public class VentanaPrincipal extends JFrame {
         JMenuItem itemEstadisticas = new JMenuItem("Estadísticas");
         itemEstadisticas.addActionListener(e -> mostrarEstadisticas());
         
+        itemRecordatorios = new JMenuItem("Recordatorios");
+        itemRecordatorios.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
+        itemRecordatorios.addActionListener(e -> mostrarDialogoRecordatorios());
+        
         menuVer.add(itemHistorial);
         menuVer.add(itemEstadisticas);
+        menuVer.addSeparator();
+        menuVer.add(itemRecordatorios);
         
         // Menú Ayuda
         JMenu menuAyuda = new JMenu("Ayuda");
@@ -618,6 +700,27 @@ public class VentanaPrincipal extends JFrame {
                         "© 2024 - Código Original Propio";
         
         JOptionPane.showMessageDialog(this, mensaje, "Acerca de", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Muestra el diálogo de recordatorios con los objetivos próximos a vencer
+     */
+    private void mostrarDialogoRecordatorios() {
+        List<Objetivo> objetivosProximos = controlador.obtenerObjetivosProximosVencer();
+        
+        if (objetivosProximos.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "No hay objetivos próximos a vencer en los próximos " + 
+                servicioRecordatorios.getDiasAnticipacion() + " días.",
+                "Sin Recordatorios",
+                JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            DialogoRecordatorios dialogo = new DialogoRecordatorios(this, controlador, objetivosProximos);
+            dialogo.setVisible(true);
+            
+            // Marcar como mostradas para evitar duplicados
+            servicioRecordatorios.reiniciarNotificaciones();
+        }
     }
     
     // Clase interna para renderizar barras de progreso en la tabla
